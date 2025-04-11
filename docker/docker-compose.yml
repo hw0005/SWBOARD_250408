@@ -1,0 +1,39 @@
+services:
+  board-mysql:
+    image: mysql:8.4.3
+    volumes:
+      - myvolume:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_ROOT_HOST: "%"
+      MYSQL_DATABASE: board_jpa
+      MYSQL_USER: spring
+      MYSQL_PASSWORD: 1234
+    networks:
+      - board-net
+    healthcheck:
+      start_period: 10s
+      start_interval: 5s
+      interval: 30s
+
+  spring-board:
+    depends_on:
+      - board-mysql
+    build: ../boardjpa
+    image: hw0005/board:1.0
+    ports:
+      - "8080:8080"
+    networks:
+      - board-net
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://board-mysql:3306/board_jpa?allowPublicKeyRetrieval=true&useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Seoul&allowMultiQueries=true
+      SPRING_DATASOURCE_USERNAME: spring
+      SPRING_DATASOURCE_PASSWORD: 1234
+
+networks:
+  board-net:
+    external: true
+    
+volumes:
+  myvolume:
+    external: true

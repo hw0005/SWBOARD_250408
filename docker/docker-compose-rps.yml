@@ -1,0 +1,76 @@
+services:
+  gateway:
+    build: ../gateway
+    image: hw0005/gateway:1.0
+    ports:
+      - "8000:8000"
+    environment:
+      SPRING_CLOUD_CONSUL_HOST: msa-consul
+      SPRING_CLOUD_CONSUL_PORT: 8500
+      SPRING_RABBITMQ_HOST: msa-rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: guest
+      SPRING_RABBITMQ_PASSWORD: guest
+    networks:
+      - board-net
+      
+  logs:
+    build: ../logs
+    image: hw0005/logs:1.0
+    ports:
+      - "8580:8580"
+    environment:
+      SPRING_RABBITMQ_HOST: msa-rabbitmq
+      SPRING_CLOUD_CONSUL_HOST: msa-consul
+      SPRING_CLOUD_CONSUL_PORT: 8500
+    networks:
+      - board-net
+
+  leaderboard:
+    build: ../leaderboard
+    image: hw0005/leaderboard:1.0
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://msa-mysql:3306/rps_db?allowPublicKeyRetrieval=true&useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Seoul&allowMultiQueries=true
+      SPRING_DATASOURCE_USERNAME: spring
+      SPRING_DATASOURCE_PASSWORD: 1234
+      SPRING_RABBITMQ_HOST: msa-rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: guest
+      SPRING_RABBITMQ_PASSWORD: guest
+      SPRING_CLOUD_CONSUL_HOST: msa-consul
+      SPRING_CLOUD_CONSUL_PORT: 8500
+    networks:
+      - board-net
+      
+  rpsgame:
+    build: ../rpsgame
+    image: hw0005/rpsgame:1.0
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://msa-mysql:3306/rps_db?allowPublicKeyRetrieval=true&useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Seoul&allowMultiQueries=true
+      SPRING_DATASOURCE_USERNAME: spring
+      SPRING_DATASOURCE_PASSWORD: 1234
+      SPRING_RABBITMQ_HOST: msa-rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: guest
+      SPRING_RABBITMQ_PASSWORD: guest
+      SPRING_CLOUD_CONSUL_HOST: msa-consul
+      SPRING_CLOUD_CONSUL_PORT: 8500
+    networks:
+      - board-net
+
+
+  rps-front:
+    build: C:\study\source\react\rps-front
+    image: hw0005/rps-front:1.0
+    ports:
+      - "5173:5173"
+    networks:
+      - board-net
+      
+networks:
+  board-net:
+    external: true
